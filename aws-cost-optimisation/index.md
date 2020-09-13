@@ -32,7 +32,7 @@ A collection of cost optimisation practices for AWS organised by service.
 * Use S3 lifecycle rules for log buckets 
 
 # Cloudwatch
-* Log group retention
+* [Ensure Cloudwatch logs are not retained forever](ensure-cloudwatch-logs-are-not-retained-forever.md)
 * Vended log options
 
 # Enterprise optimisation
