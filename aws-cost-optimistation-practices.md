@@ -30,10 +30,10 @@ A collection of cost optimisation practices for AWS organised by service.
 # S3
 * Storage classes & intelligent tiering
 * Use S3 lifecycle rules for log buckets 
-* VPC flow logs - Cloudwatch v S3
 
 # Cloudwatch
 * Log expiration
+* Vended log options
 
 # Enterprise optimisation
 * AWS enterprise discount programmes
