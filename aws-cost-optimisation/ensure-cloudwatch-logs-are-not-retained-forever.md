@@ -1,4 +1,4 @@
-# Pattern: Ensure Cloudwatch logs are not retained forever
+# Practice: Ensure Cloudwatch logs are not retained forever
 
 Cloudwatch log groups can be configured to automatically delete logs based on a retention setting. However the default AWS retention setting for cloudwatch log groups is set to never expire events. This typically leads to cloudwatch logging costs increasing day by day as more log events are added to Cloudwatch.
 
