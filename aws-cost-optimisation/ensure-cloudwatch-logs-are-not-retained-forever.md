@@ -2,7 +2,7 @@
 
 Cloudwatch log groups can be configured to automatically delete logs based on a retention setting. However the default AWS retention setting for cloudwatch log groups is set to never expire events. This typically leads to cloudwatch logging costs increasing day by day as more log events are added to Cloudwatch.
 
-## Therefore
+### Therefore
 
 To keep cloudwatch logging costs at a steady state relative to workload ensure that all cloudwatch log groups have specified a retention setting that isn't "Never Expire". Once a sensible retention setting is specified, log events older than the retention setting will automatically be deleted and related storage costs will no longer be incurred.
 
