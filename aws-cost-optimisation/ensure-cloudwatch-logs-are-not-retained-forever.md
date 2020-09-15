@@ -55,9 +55,7 @@ def all_log_groups(logs_client):
     all_log_groups = []
     paginator = logs_client.get_paginator("describe_log_groups")
 
-    page_iterator = paginator.paginate()
-
-    for page in page_iterator:
+    for page in paginator.paginate():
         all_log_groups.extend(page["logGroups"])
 
     return all_log_groups
