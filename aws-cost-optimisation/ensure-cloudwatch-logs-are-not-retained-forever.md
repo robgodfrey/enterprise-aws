@@ -43,9 +43,7 @@ def set_retention_period_for_never_expiring_log_groups(region_name, retention_in
     logs_client = boto3_client("logs", region_name=region_name)
 
     for log_group in all_log_groups(logs_client):
-        if "retentionInDays" in log_group:
-            continue
-        else:
+        if "retentionInDays" not in log_group:
             update_log_group_retention_setting(logs_client, log_group["logGroupName"], retention_in_days)
 
     print("Processed all log groups in region '{}'.".format(region_name))
