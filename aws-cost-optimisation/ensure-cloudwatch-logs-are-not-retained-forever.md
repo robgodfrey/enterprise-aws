@@ -20,28 +20,35 @@ Both cloudformation and terraform support creation of cloudwatch log groups with
 
 ### Bulk update existing log groups
 
-An example python script to iterate through all log groups in all region in a single AWS account  
-```python
+A sample python3 script that iterates through all cloudwatch log groups in all regions in a single AWS account and set the retention period to 7 days where not already set. 
+```python3
 import boto3
 
 
-def boto3_client(service, region_name=None):
-    """Retrieve a boto3 client for the specified service and region (if supplied)."""
-    if region_name:
-        return boto3.client(service, region_name=region_name)
-    else:
-        return boto3.client(service)
+def main():
+    retention_in_days = 7
+
+    for region_name in all_regions():
+        set_retention_period_for_never_expiring_log_groups(region_name, retention_in_days)
 
 
-def regions():
-    """Retrieve a list if AWS regions."""
+def all_regions():
     response = boto3_client("ec2").describe_regions()
     return [region["RegionName"] for region in response["Regions"]]
 
 
-def update_log_group_retention_setting(logs_client, log_group_name, retention_in_days):
-    logs_client.put_retention_policy(logGroupName=log_group_name, retentionInDays=retention_in_days)
-    print("Updated retention setting for log group '{}' to {} days.".format(log_group_name, retention_in_days))
+def set_retention_period_for_never_expiring_log_groups(region_name, retention_in_days):
+    print("Processing log groups in region '{}' ...".format(region_name))
+
+    logs_client = boto3_client("logs", region_name=region_name)
+
+    for log_group in all_log_groups(logs_client):
+        if "retentionInDays" in log_group:
+            continue
+        else:
+            update_log_group_retention_setting(logs_client, log_group["logGroupName"], retention_in_days)
+
+    print("Processed all log groups in region '{}'.".format(region_name))
 
 
 def all_log_groups(logs_client):
@@ -56,30 +63,21 @@ def all_log_groups(logs_client):
     return all_log_groups
 
 
-def set_retention_period_for_never_expiring_log_groups(region_name, retention_in_days):
-    print("Processing log groups in region '{}'.".format(region_name))
-
-    logs_client = boto3_client("logs", region_name=region_name)
-
-    for log_group in all_log_groups(logs_client):
-        if "retentionInDays" in log_group:
-            continue
-        else:
-            update_log_group_retention_setting(logs_client, log_group["logGroupName"], retention_in_days)
-
-    print("Processed all log groups in region '{}'.".format(region_name))
+def update_log_group_retention_setting(logs_client, log_group_name, retention_in_days):
+    logs_client.put_retention_policy(logGroupName=log_group_name, retentionInDays=retention_in_days)
+    print(" - Updated retention setting for log group '{}' to {} days.".format(log_group_name, retention_in_days))
 
 
-def main():
-
-    retention_in_days = 7
-
-    for region_name in regions():
-        set_retention_period_for_never_expiring_log_groups(region_name, retention_in_days)
+def boto3_client(service, region_name=None):
+    if region_name:
+        return boto3.client(service, region_name=region_name)
+    else:
+        return boto3.client(service)
 
 
 if __name__ == "__main__":
     main()
+
 ```
 
 ### Automate retention setting on log group creation
