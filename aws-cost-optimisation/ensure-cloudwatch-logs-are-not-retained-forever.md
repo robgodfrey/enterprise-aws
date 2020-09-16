@@ -28,7 +28,7 @@ Both cloudformation and terraform support creation of cloudwatch log groups with
 
 ### Bulk update existing log groups with "Never Expire" retention
 
-A sample python3 script that iterates through all cloudwatch log groups in all regions in a single AWS account and set the retention period to 7 days where not already set. 
+A sample python3 script that iterates through all cloudwatch log groups in all regions in a single AWS account and sets the retention period to 7 days where not already set. 
 ```python3
 import boto3
 
