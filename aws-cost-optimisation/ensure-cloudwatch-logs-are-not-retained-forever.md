@@ -8,7 +8,7 @@ To avoid cloudwatch log storage costs continually increasing over time ensure th
 
 ## Identifying log groups with "Never Expire" retention
 
-The "Never Expire" retention setting is represented as a missing retentionInDays property in the AWS Cloudwatch Logs API for response for [DescribeLogGroups](https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_DescribeLogGroups.html). The following [aws logs describe-log-groups AWS CLI command](https://docs.aws.amazon.com/cli/latest/reference/logs/describe-log-groups.html) filters using a [JMESPath expression](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output.html#cli-usage-output-filter) for log groups without a retention setting (in the eu-west-1 region within a single AWS account). Note the double negative with ! (not) applied to not_null(retentionInDays).    
+The "Never Expire" retention setting is represented as a missing retentionInDays property in the AWS Cloudwatch Logs API response for [DescribeLogGroups](https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_DescribeLogGroups.html). The following [aws logs describe-log-groups AWS CLI command](https://docs.aws.amazon.com/cli/latest/reference/logs/describe-log-groups.html) filters using a [JMESPath expression](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output.html#cli-usage-output-filter) for log groups without a retention setting (in the eu-west-1 region within a single AWS account). Note the double negative with ! (not) applied to not_null(retentionInDays).    
 
 ```aws logs describe-log-groups --query 'logGroups[?!not_null(retentionInDays)].logGroupName' --region eu-west-1```
 
