@@ -45,7 +45,7 @@ def update_retention_period_for_never_expiring_log_groups_in_all_regions(retenti
 def update_retention_period_for_never_expiring_log_groups(region_name, retention_in_days):
     print("Processing log groups in region '{}' ...".format(region_name))
 
-    logs_client = boto3_client("logs", region_name=region_name)
+    logs_client = boto3.client("logs", region_name=region_name)
 
     for log_group in all_log_groups(logs_client):
         if "retentionInDays" not in log_group:
@@ -60,7 +60,7 @@ def update_log_group_retention_setting(logs_client, log_group_name, retention_in
 
 
 def all_regions():
-    response = boto3_client("ec2").describe_regions()
+    response = boto3.client("ec2").describe_regions()
     return [region["RegionName"] for region in response["Regions"]]
 
 
@@ -72,13 +72,6 @@ def all_log_groups(logs_client):
         all_log_groups.extend(page["logGroups"])
 
     return all_log_groups
-
-
-def boto3_client(service, region_name=None):
-    if region_name:
-        return boto3.client(service, region_name=region_name)
-    else:
-        return boto3.client(service)
 
 
 if __name__ == "__main__":
