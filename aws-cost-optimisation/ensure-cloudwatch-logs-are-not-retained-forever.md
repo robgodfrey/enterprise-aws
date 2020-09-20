@@ -38,17 +38,14 @@ Both cloudformation and terraform support creation of cloudwatch log groups with
 
 If a large number of log groups need to be updated, the following python3 script iterates through all cloudwatch log groups in all regions in a single AWS account and sets the retention period to 7 days where not already set.
 
+#### bulk-update-log-group-retention.py
 ```python3
 import boto3
 
 
 def main():
-    update_retention_period_for_never_expiring_log_groups_in_all_regions(retention_in_days = 7)
-
-
-def update_retention_period_for_never_expiring_log_groups_in_all_regions(retention_in_days):
     for region_name in all_regions():
-        update_retention_period_for_never_expiring_log_groups(region_name, retention_in_days)
+        update_retention_period_for_never_expiring_log_groups(region_name, retention_in_days = 7)
 
 
 def update_retention_period_for_never_expiring_log_groups(region_name, retention_in_days):
@@ -90,9 +87,99 @@ if __name__ == "__main__":
 
 ### Automate retention setting using AWS Lambda
 
-TODO: Example project using cloudwatch event rule daily trigger
+The above command line script can be adapted into a lambda function (see below). Here the lambda_handler function replaces the main function from the CLI example and an environment variable RETENTION_IN_DAYS can be used to specify the desired retention setting for never expiring log groups. 
+
+#### update_never_expiring_log_groups.py
+```python3
+import boto3
+import os
 
 
+def lambda_handler(event, context):
+
+    retention_in_days = int(os.environ.get("RETENTION_IN_DAYS", "7"))
+
+    for region_name in all_regions():
+        update_retention_period_for_never_expiring_log_groups(region_name, retention_in_days)
+
+    return {
+        "message": "Function completed successfully."
+    }
+
+
+def update_retention_period_for_never_expiring_log_groups(region_name, retention_in_days):
+    print("Processing log groups in region '{}' ...".format(region_name))
+
+    logs_client = boto3.client("logs", region_name=region_name)
+
+    for log_group in all_log_groups(logs_client):
+        if "retentionInDays" not in log_group:
+            update_log_group_retention_setting(logs_client, log_group["logGroupName"], retention_in_days)
+
+    print("Processed all log groups in region '{}'.".format(region_name))
+
+
+def update_log_group_retention_setting(logs_client, log_group_name, retention_in_days):
+    logs_client.put_retention_policy(logGroupName=log_group_name, retentionInDays=retention_in_days)
+    print(" - Updated retention setting for log group '{}' to {} days.".format(log_group_name, retention_in_days))
+
+
+def all_regions():
+    response = boto3.client("ec2").describe_regions()
+    return [region["RegionName"] for region in response["Regions"]]
+
+
+def all_log_groups(logs_client):
+    all_log_groups = []
+    paginator = logs_client.get_paginator("describe_log_groups")
+
+    for page in paginator.paginate():
+        all_log_groups.extend(page["logGroups"])
+
+    return all_log_groups
+    
+```
+The lambda function can be triggered on a schedule using an EventBridge rule.
+Using the serverless framework it is fairly simple to set up the EventBridge rule by specifying a schedule event to trigger the function as follows. 
+
+```yaml
+functions:
+  UpdateNeverExpiringLogGroups:
+    ...
+    events:
+      - schedule: rate(7 days)
+```
+
+The complete serverless.yml config file is shown below:
+
+#### serverless.yml
+```yaml
+service: log-group-retention-setter
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: eu-west-1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "ec2:DescribeRegions"
+        - "logs:DescribeLogGroups"
+        - "logs:PutRetentionPolicy"
+      Resource: "*"
+
+functions:
+  UpdateNeverExpiringLogGroups:
+    name: ${self:service}-${self:provider.stage, 'dev'}-update-never-expiring-log-groups
+    description: Update the retention setting of cloudwatch log groups where they are set to never expire
+    handler: update_never_expiring_log_groups.lambda_handler
+    timeout: 300
+    memorySize: 128
+    events:
+      - schedule: rate(7 days)
+    environment:
+      RETENTION_IN_DAYS: 7
+```
 
 
 ### Useful links:
@@ -100,4 +187,7 @@ TODO: Example project using cloudwatch event rule daily trigger
 * See the [aws logs describe-log-groups command docs](https://docs.aws.amazon.com/cli/latest/reference/logs/describe-log-groups.html) for usage details of the AWS command to list cloudwatch log groups
 * See the [query docs](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output.html#cli-usage-output-filter) for specifying query expressions with JMESPath to control AWS CLI output
 * See the [filter docs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Filtering.html#Filtering_Resources_CLI) for matching and filtering resources based on property values, although note negation or testing for the absence of a property is not supported 
+* [Serverless configuration reference](https://www.serverless.com/framework/docs/providers/aws/guide/serverless.yml/)
+* Serverless docs for [schedule events](https://www.serverless.com/framework/docs/providers/aws/events/schedule/)
+
 
