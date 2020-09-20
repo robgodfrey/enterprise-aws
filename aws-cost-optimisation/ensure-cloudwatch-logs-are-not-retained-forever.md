@@ -23,7 +23,7 @@ Note the double negative in the query expression with ! (not) applied to not_nul
 #### Useful AWS CLI docs:
 * See the [aws logs describe-log-groups command docs](https://docs.aws.amazon.com/cli/latest/reference/logs/describe-log-groups.html) for usage details of the AWS command to list cloudwatch log groups
 * See the [query docs](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output.html#cli-usage-output-filter) for specifying query expressions with JMESPath to control AWS CLI output
-* See the [filter docs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Filtering.html#Filtering_Resources_CLI) for matching and filtering resources based on property values
+* See the [filter docs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Filtering.html#Filtering_Resources_CLI) for matching and filtering resources based on property values, although not negation or testing for the absence of a property is not supported 
 
 ## Specifying log group retention
 
