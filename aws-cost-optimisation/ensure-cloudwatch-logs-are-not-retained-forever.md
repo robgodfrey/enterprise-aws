@@ -187,6 +187,8 @@ functions:
 * See the [aws logs describe-log-groups command docs](https://docs.aws.amazon.com/cli/latest/reference/logs/describe-log-groups.html) for usage details of the AWS command to list cloudwatch log groups
 * See the [query docs](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output.html#cli-usage-output-filter) for specifying query expressions with JMESPath to control AWS CLI output
 * See the [filter docs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Filtering.html#Filtering_Resources_CLI) for matching and filtering resources based on property values, although note negation or testing for the absence of a property is not supported 
+
+* [Installing the Serverless framework](https://www.serverless.com/framework/docs/getting-started/)
 * [Serverless configuration reference](https://www.serverless.com/framework/docs/providers/aws/guide/serverless.yml/)
 * Serverless docs for [schedule events](https://www.serverless.com/framework/docs/providers/aws/events/schedule/)
 
