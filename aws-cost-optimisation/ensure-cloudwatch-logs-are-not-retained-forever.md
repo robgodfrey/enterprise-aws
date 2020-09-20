@@ -38,7 +38,7 @@ Both cloudformation and terraform support creation of cloudwatch log groups with
 
 If a large number of log groups need to be updated, the following python3 script iterates through all cloudwatch log groups in all regions in a single AWS account and sets the retention period to 7 days where not already set.
 
-#### bulk-update-log-group-retention.py
+#### bulk-update-log-group-retention-cli.py
 ```python3
 import boto3
 
@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
 The above command line script can be adapted into a lambda function (see below). Here the lambda_handler function replaces the main function from the CLI example and an environment variable RETENTION_IN_DAYS can be used to specify the desired retention setting for never expiring log groups. 
 
-#### update_never_expiring_log_groups.py
+#### bulk-update-log-group-retention-sls.py
 ```python3
 import boto3
 import os
@@ -154,7 +154,7 @@ The complete serverless.yml config file is shown below:
 
 #### serverless.yml
 ```yaml
-service: log-group-retention-setter
+service: bulk-update-log-group-retention
 
 provider:
   name: aws
@@ -170,9 +170,9 @@ provider:
 
 functions:
   UpdateNeverExpiringLogGroups:
-    name: ${self:service}-${self:provider.stage, 'dev'}-update-never-expiring-log-groups
-    description: Update the retention setting of cloudwatch log groups where they are set to never expire
-    handler: update_never_expiring_log_groups.lambda_handler
+    name: ${self:service}-${self:provider.stage, 'dev'}-bulk-update-log-group-retention-cli
+    description: Update the retention setting of all cloudwatch log groups where they are set to never expire
+    handler: bulk-update-log-group-retention-cli.lambda_handler
     timeout: 300
     memorySize: 128
     events:
