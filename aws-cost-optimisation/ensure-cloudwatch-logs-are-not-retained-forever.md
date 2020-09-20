@@ -18,7 +18,7 @@ The "Never Expire" retention setting is represented as a missing retentionInDays
 
 ```aws logs describe-log-groups --query 'logGroups[?!not_null(retentionInDays)]'```
 
-Note the double negative in the query expression with ! (not) applied to not_null(retentionInDays) in the JMESPath expression to select log groups with a missing retentionInDays setting. 
+Note the double negative in the query expression with ! (not) applied to not_null(retentionInDays) to select log groups with a missing retentionInDays setting. 
 
 ## Specifying log group retention
 
